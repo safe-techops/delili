@@ -57,6 +57,24 @@ model PaymentChannel {
   createdAt DateTime @default(now())
 }
 
+/** A manual bookkeeping entry (income or expense) the admin records —
+ * subscription revenue itself isn't stored here, it's derived on the fly
+ * from User.approvedAt × SUBSCRIPTION_PRICE_MRU (see src/data/pricing.ts),
+ * same as the dashboard's revenue chart. This model is only for the rest of
+ * the ledger: costs, manual/offline income, adjustments. Declared here too
+ * (even though this app never reads/writes it) purely so `prisma db push`
+ * from this repo never drops the table. */
+model AccountingEntry {
+  id         String   @id @default(cuid())
+  /** INCOME | EXPENSE */
+  type       String
+  amountMru  Int
+  category   String
+  note       String   @default("")
+  occurredAt DateTime
+  createdAt  DateTime @default(now())
+}
+
 model Quiz {
   id                 String            @id @default(cuid())
   slug               String            @unique
